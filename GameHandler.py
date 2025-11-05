@@ -1,6 +1,7 @@
 import Board
 import Player
 import tkinter as tk
+import fileReading
 
 
 class GameHandler:
@@ -10,13 +11,8 @@ class GameHandler:
         self.player2 = player2
         self.current_player = 1
         self.score = [0,0]
-        self.dimMat=4
-        self.matrix=[
-                     [1, 5, 7, 2],
-                     [3, 6, 9, 8],
-                     [4, 4, 2, 1],
-                     [9, 6, 3, 6]
-                    ]
+        self.matrix = fileReading.load_board_until_ok()
+        self.dimMat = len(self.matrix)
         # Creiamo la Board e le passiamo un riferimento a questo GameHandler
         self.board = Board.Board(self)
 
