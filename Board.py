@@ -89,7 +89,7 @@ class Board:
 
     # === Highlight the current player ===
     def highlight_current_player(self, current):
-        if current == 1:
+        if current == 0:
             self.player1_label.config(bg="#666")
             self.player2_label.config(bg="#444")
         else:
