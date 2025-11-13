@@ -6,6 +6,7 @@ import tkinter as tk
 import fileReading
 import random as rd
 import RandomStrategy
+import GreedyStrategy
 
 
 class GameHandler:

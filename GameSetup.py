@@ -142,6 +142,7 @@ class GameSetup:
         rb_values = [
             ("Random Strategy", "random"),
             ("Safe Choice Strategy", "safe_choice"),
+            ("Greedy Strategy", "greedy"),
             #("Minimax", "minimax"), implement when the minmax strategy will be completed
         ]
         for text, value in rb_values:
@@ -260,6 +261,10 @@ class GameSetup:
             case "safe_choice":
 
                 return SafeChoiceStrategy()
+
+            case "greedy":
+
+                return GreedyStrategy()
             # Add other possible strategies here
 
             #case "minimax":
