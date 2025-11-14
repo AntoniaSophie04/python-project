@@ -6,7 +6,7 @@ class RandomStrategy(Strategy):
     """
     Strategy that picks a random cell (not already picked)
     """
-    def move(self, matrix,last_move):
+    def move(self, matrix,last_move, scores):
         """
         Parameters
         ----------

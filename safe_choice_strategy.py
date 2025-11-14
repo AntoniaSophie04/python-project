@@ -26,7 +26,7 @@ class SafeChoiceStrategy(Strategy):
     """
 
     # ---- public API ----
-    def move(self, matrix: Matrix, last_move: Optional[Coord]) -> Optional[Coord]:
+    def move(self, matrix: Matrix, last_move: Optional[Coord], scores) -> Optional[Coord]:
         n = len(matrix)
         if n == 0:
             return None

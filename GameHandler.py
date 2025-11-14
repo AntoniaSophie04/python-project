@@ -37,7 +37,7 @@ class GameHandler:
     def computer_turn(self):
         self.board.disable_all_buttons()
         player = self.players[self.current_player]
-        row, col = player.move(self.matrix, self.last_move)
+        row, col = player.move(self.matrix, self.last_move, self.score)
         self.handle_cell_click(row, col)
 
     # Calling from Board when a player clicks on a cel

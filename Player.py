@@ -10,5 +10,5 @@ class Player:
     def getName(self):
         return self.name
 
-    def move(self,matrix,last_move=None):
-        return self.strategy.move(matrix,last_move)
+    def move(self, matrix, last_move=None, scores=(0, 0)):
+        return self.strategy.move(matrix, last_move, scores)

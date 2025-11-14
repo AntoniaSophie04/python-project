@@ -4,6 +4,7 @@ import RandomStrategy
 import Player
 from safe_choice_strategy import SafeChoiceStrategy
 from GameSetup import GameSetup
+from Strategies.MCTS import MCTSStrategy
 
 setup = GameSetup()
 config = setup.run() # config will store the player's choices in a map

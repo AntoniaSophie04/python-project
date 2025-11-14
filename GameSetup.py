@@ -5,6 +5,7 @@ from GameHandler import GameHandler
 from RandomStrategy import RandomStrategy
 from safe_choice_strategy import SafeChoiceStrategy
 from GreedyStrategy import GreedyStrategy
+from Strategies.MCTS import MCTSStrategy
 
 
 class GameSetup:
@@ -144,6 +145,7 @@ class GameSetup:
             ("Random Strategy", "random"),
             ("Safe Choice Strategy", "safe_choice"),
             ("Greedy Strategy", "greedy"),
+            ("Monte Carlo Tree Search Strategy", "MCTS")
             #("Minimax", "minimax"), implement when the minmax strategy will be completed
         ]
         for text, value in rb_values:
@@ -267,6 +269,10 @@ class GameSetup:
             case "greedy":
 
                 return GreedyStrategy()
+            
+            case "MCTS":
+                
+                return MCTSStrategy()
             # Add other possible strategies here
 
             #case "minimax":

@@ -6,7 +6,7 @@ class GreedyStrategy(Strategy):
     Strategy that picks the highest number
     """
 
-    def move(self, matrix, last_move):
+    def move(self, matrix, last_move, scores):
         """
         Parameters
         ----------
