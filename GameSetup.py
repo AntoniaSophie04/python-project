@@ -156,6 +156,7 @@ class GameSetup:
     # DOES NOT store player objects. Disables the opposite button and shows/hides strategy options.
     def select_player(self, player, choice):
         if player == "p1":
+            self.p1_type = choice
             if choice == "human":
                 # Disable the opposite button; reset and hide any previous strategy selection for p1
                 self.p1_computer.config(state="disabled")
