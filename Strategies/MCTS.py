@@ -163,6 +163,23 @@ class MCTSStrategy(Strategy):
         self.max_iterations= max_iterations
         self.time_limit= time_limit
 
+    def number_iterations(self, available_moves, internal_board):
+        """
+        want the number of iterations to depend on the size of the board and available moves
+        """
+        #look how wide tree is: how many numbers can choose from in rows/cols
+        branching = max(1, len(available_moves))
+        #look how deep tree is: how many numbers still on board
+        remaining = sum(1 for row in internal_board for v in row if v != 0)
+
+        base = 400   #minimum brain power
+        alpha = 0.7  #how much extra branching costs
+
+        #more moves remaining and bigger branching -> more iterations; 
+        iters = int(base * (branching ** alpha) * (1.0 + math.log1p(remaining)))
+        #never exceed 100,000 iterations to prevent freezing
+        return min(iters, 100_000)
+
     def move(self, board, last_move, scores):
         """
         Analyzes the current game state and returns the best move.
@@ -191,6 +208,10 @@ class MCTSStrategy(Strategy):
         #get available moves for the current state of the game
         available_moves = root.get_actions()
 
+        #decide how many iterations to run this move, depending on board size
+        target_iterations = self.number_iterations(available_moves, internal_board)
+
+
         #trivial moves: if no move available return None, and if only 1 move available choose that without simulating
         if not available_moves:
             return None
@@ -198,7 +219,8 @@ class MCTSStrategy(Strategy):
             return available_moves[0]
         
         #repeat 4 steps of MCTS as many times as possible-> until the time runs out or maximal iterations are reached
-        while (time.time() - start_time < self.time_limit) and (iteration_count < self.max_iterations):
+        while (time.time() - start_time < self.time_limit) and (iteration_count < target_iterations):
+
             #Selection: travels down the tree, with UCB1 until it hits a node that hasn't been fully explored (=leaf)
             leaf_node = self.select(root)
             
@@ -256,32 +278,7 @@ class MCTSStrategy(Strategy):
             if not moves:
                 break #Game over
             move = random.choice(moves)
-            
-            """ # ε-greedy rollout that avoids gifting a huge reply
-            if random.random() < 0.85:
-            # Score = our gain minus a fraction of opponent's immediate best reply
-                def score_move(mv):
-                    r, c = mv
-                    v = copied_board[r][c]
 
-                # Opponent's reply moves if we played mv next (we DON'T need to mutate the board here).
-                # Treat the just-picked cell as 0 when estimating opponent value.
-                    reply_moves = MCTSNode.get_available_moves(copied_board, mv)
-                    opp_best = 0
-                    for rr, cc in reply_moves:
-                        if rr == r and cc == c:
-                        # that cell would be zero after our move
-                            candidate = 0
-                        else:
-                            candidate = copied_board[rr][cc]
-                        if candidate > opp_best:
-                            opp_best = candidate
-
-                    return v - 0.6 * opp_best  # tune 0.4–0.8
-
-                move = max(moves, key=score_move)
-            else:
-                move = random.choice(moves) """
 
             
             #aply random move to the temporary state
