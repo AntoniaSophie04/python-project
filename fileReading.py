@@ -1,7 +1,7 @@
 import os
 import numpy as np
 
-def load_board_until_ok(default_name="matrix.txt"):
+def load_board_until_ok(default_name="boards/board.txt"):
     """
     Keep asking for a filename until we can read a valid square integer matrix.
     Tries 'matrix.txt' first; on failure, prompts the user repeatedly.
@@ -48,7 +48,10 @@ def open_file(name):
             stripped = line.strip()
             if not stripped:               # skip empty lines
                 continue
-            parts = stripped.split(',')
+
+            if ',' in stripped: parts = stripped.split(',')
+            else: parts = stripped.split()
+
             row = []
             for value in parts:
                 value = value.strip()

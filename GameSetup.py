@@ -1,4 +1,6 @@
 import tkinter as tk
+import os
+import random
 import Player
 import Strategy
 from GameHandler import GameHandler
@@ -6,7 +8,7 @@ from RandomStrategy import RandomStrategy
 from safe_choice_strategy import SafeChoiceStrategy
 from GreedyStrategy import GreedyStrategy
 from Strategies.MCTS import MCTSStrategy
-
+CONSTANT_SEED = 12345
 
 class GameSetup:
     def __init__(self):
@@ -18,6 +20,13 @@ class GameSetup:
         # Hold optional strategy selections for p1/p2 (string names)
         self.p1_strategy_var = tk.StringVar(value="")  # empty means not selected yet
         self.p2_strategy_var = tk.StringVar(value="")
+
+        # Variables for board size, reproducibility and board file
+        self.board_size_var = tk.StringVar(value="5")
+        self.reproducible_var = tk.BooleanVar(value=False)
+        self.repro_checkbox = None
+        self.board_file = None
+        self.btn_manual = None
 
         # Frames that will host strategy buttons (created later)
         self.p1_strategy_frame = None
@@ -112,6 +121,41 @@ class GameSetup:
         self.p2_strategy_frame = tk.Frame(container, bg="#222")
         self.p2_strategy_frame.grid(row=3, column=2, pady=(0, 10))
 
+        # Board Setup 
+        board_frame = tk.LabelFrame(self.root, text="Board Setup", fg="white", bg="#222",
+                                    font=("Arial", 11, "bold"), labelanchor="n")
+        board_frame.configure(highlightbackground="#444", highlightcolor="#444")
+        board_frame.pack(fill="x", padx=12, pady=(6, 8))
+
+        inner = tk.Frame(board_frame, bg="#222")
+        inner.pack(padx=8, pady=8, fill="x")
+
+        tk.Label(inner, text="Pick the board size (1–10):", fg="white", bg="#222").grid(row=0, column=0, sticky="e", pady=2, padx=4)
+        tk.Spinbox(inner, from_=1, to=10, textvariable=self.board_size_var, width=4,
+                   justify="center").grid(row=0, column=1, sticky="w", pady=2)
+
+        # Checkbox: Reproducibility (not if you randomly create the board)
+        self.repro_checkbox = tk.Checkbutton(
+        inner, text="Reproducibility (fixed seed)", variable=self.reproducible_var,
+        bg="#222", fg="white", activebackground="#222", activeforeground="white", selectcolor="#333"
+        )
+        self.repro_checkbox.grid(row=0, column=2, columnspan=2, sticky="w", padx=12)
+
+        # Buttons
+        btns = tk.Frame(inner, bg="#222")
+        btns.grid(row=1, column=0, columnspan=3, sticky="ew", pady=(8, 0))
+        btns.grid_columnconfigure(0, weight=0)  # left
+        btns.grid_columnconfigure(1, weight=1)  # spacer
+        btns.grid_columnconfigure(2, weight=0)  # right
+
+        btn = tk.Button(
+            btns, text="Create board with chosen size",
+            command=lambda: self.generate_board()
+        )
+        btn.grid(row=0, column=0, sticky="w", padx=4)
+
+        #tk.Label(board_frame, fg="#ccc", bg="#222").pack(pady=(6, 2))
+
         # Go back button
         tk.Button(self.root, text="Go back to start page", command=self.show_start_page).pack(pady=(4, 6))
 
@@ -122,6 +166,8 @@ class GameSetup:
         # Re-check whenever a strategy selection changes (enables Start when valid)
         self.p1_strategy_var.trace_add("write", lambda *_: self.update_start_button())
         self.p2_strategy_var.trace_add("write", lambda *_: self.update_start_button())
+
+        
 
     # Creates strategy radio buttons dynamically when Computer is chosen
     def show_strategy_options(self, which_player: str):
@@ -193,6 +239,7 @@ class GameSetup:
           - P1 has chosen (one of its buttons is disabled),
           - P2 has chosen,
           - For every player marked as 'Computer', a strategy has been selected.
+          - The board file has been configured
         """
         p1_chosen = (self.p1_human["state"] == "disabled") or (self.p1_computer["state"] == "disabled")
         p2_chosen = (self.p2_human["state"] == "disabled") or (self.p2_computer["state"] == "disabled")
@@ -217,7 +264,9 @@ class GameSetup:
         else:
             p2_ok = False  # nothing chosen yet
 
-        self.start_button.config(state="normal" if (p1_chosen and p2_chosen and p1_ok and p2_ok) else "disabled")
+        ready_board = bool(self.board_file)
+
+        self.start_button.config(state="normal" if (p1_chosen and p2_chosen and p1_ok and p2_ok and ready_board) else "disabled")
 
     def create_players(self):
         """
@@ -281,4 +330,39 @@ class GameSetup:
 
             case _:
                 # default case (if none of the above match)
-                raise ValueError(f"Unknown strategy: {strategy_name}")
+                raise ValueError(f"Unknown strategy: {strategy_name}")      
+
+    # Generates a quadratic Board according to the board size input
+    def generate_board(self):
+        try: 
+            size = int(self.board_size_var.get())
+        except ValueError: 
+            self.board_file = None
+            self.update_start_button()
+            return
+        
+        if self.repro_checkbox: 
+            self.repro_checkbox.config(state="normal")
+        
+        rnd = random.Random(CONSTANT_SEED) if self.reproducible_var.get() else random.Random()
+
+        matrix = [[rnd.randint(1,9) for _ in range(size)] for _ in range(size)]
+        out_dir = "boards"
+        os.makedirs(out_dir, exist_ok=True)
+        path = os.path.join(out_dir, "board.txt")
+
+        with open(path, "w", encoding="utf-8") as file: 
+            for row in matrix: 
+                file.write(" ".join(map(str, row)) + "\n")
+
+        if self.repro_checkbox:
+            self.repro_checkbox.config(state="disabled")        
+        
+        self.board_file = path
+        self.update_start_button()
+
+        
+
+        
+
+    
