@@ -1,13 +1,7 @@
 import time
 import tkinter as tk
 from tkinter import messagebox
-
-import Board
-import Player
-import fileReading
-import random as rd
-import RandomStrategy
-import GreedyStrategy
+from Game import Board, fileReading
 
 
 class GameHandler:

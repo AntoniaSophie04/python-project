@@ -1,5 +1,5 @@
 from typing import List, Optional, Tuple, Dict
-from Strategy import Strategy
+from Strategies.Strategy import Strategy
 
 Coord = Tuple[int, int]
 Matrix = List[List[object]]  # numbers or '-' for used cells

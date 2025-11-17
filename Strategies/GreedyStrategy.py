@@ -1,4 +1,4 @@
-from Strategy import Strategy
+from Strategies.Strategy import Strategy
 
 
 class GreedyStrategy(Strategy):

@@ -1,4 +1,4 @@
-import Strategy
+from Strategies.Strategy import Strategy
 
 class Player:
     def __init__(self, name="Player", is_human=True, strategy=None):

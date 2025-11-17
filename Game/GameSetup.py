@@ -1,12 +1,14 @@
 import tkinter as tk
 import os
 import random
-import Player
-import Strategy
-from GameHandler import GameHandler
-from RandomStrategy import RandomStrategy
-from safe_choice_strategy import SafeChoiceStrategy
-from GreedyStrategy import GreedyStrategy
+
+from Game import Player
+from Game.GameHandler import GameHandler
+
+from Strategies.Strategy import Strategy
+from Strategies.RandomStrategy import RandomStrategy
+from Strategies.safe_choice_strategy import SafeChoiceStrategy
+from Strategies.GreedyStrategy import GreedyStrategy
 from Strategies.MCTS import MCTSStrategy
 CONSTANT_SEED = 12345
 

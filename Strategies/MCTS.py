@@ -12,7 +12,7 @@ from copy import deepcopy
 #look for "Strategy" in the parent directory
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from Strategy import Strategy
+from Strategies.Strategy import Strategy
 
 #set exploration parameter to sqrt(2), is used to balance exploration and exploitation
 UCB_CONST = math.sqrt(2)
