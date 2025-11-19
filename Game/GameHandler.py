@@ -39,7 +39,7 @@ class GameHandler:
         self.board.set_visible()
         print("the game has started")
 
-    # ---- Helpers for ending the game ----
+    # Helpers for ending the game
     def has_any_legal_moves(self) -> bool:
         """
         Returns True if at least one button is currently clickable (state='normal').
@@ -70,7 +70,7 @@ class GameHandler:
 
         messagebox.showinfo("Game Over", message)
 
-    # ---- Computer turn (AI) ----
+    # Computer turn (AI)
     def computer_turn(self):
         player = self.players[self.current_player]
         move_result = player.move(self.matrix, self.last_move, self.score)
@@ -81,7 +81,7 @@ class GameHandler:
         row, col = move_result
         self.handle_cell_click(row, col)
 
-    # ---- Handle a click from the board (human or AI) ----
+    # Handle a click from the board (human or AI)
     def handle_cell_click(self, row, col):
         print(f"[DEBUG] Player {self.current_player+1} clicked ({row}, {col})")
 
@@ -115,3 +115,4 @@ class GameHandler:
         if not self.players[self.current_player].is_human:
             self.board.disable_all_buttons()
             self.root.after(1000, self.computer_turn)
+

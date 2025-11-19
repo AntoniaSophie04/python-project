@@ -12,6 +12,7 @@ from Strategies.RandomStrategy import RandomStrategy
 from Strategies.GreedyStrategy import GreedyStrategy
 from Strategies.MCTS import MCTSStrategy
 from Strategies.safe_choice_strategy import SafeChoiceStrategy
+from Strategies.minimax_f import AlphaBetaStrategy
 from Game.Player import Player
 
 
@@ -131,6 +132,7 @@ def create_strategy(name):
     if name == "Greedy": return GreedyStrategy()
     if name == "SafeChoice": return SafeChoiceStrategy()
     if name == "MCTS": return MCTSStrategy()
+    if name == "Minimax": return AlphaBetaStrategy()
     raise ValueError(f"{name}-strategy not existent for game")
 
 
@@ -140,7 +142,7 @@ class SimulationRunner:
         initialize one simulation run
         """
         if strategies is None:
-            strategies= ["Random", "Greedy", "SafeChoice", "MCTS"]
+            strategies= ["Random", "Greedy", "SafeChoice", "MCTS", "Minimax"]
 
         if board_dims is None:
             board_dims = [3,5,6,8,9]       #decide for small medium and large games of even and odd row/col numbers
@@ -245,11 +247,7 @@ class SimulationRunner:
 #Constructing a 95% confidence Interval:
 #N=0.25(0.051.96​)^2=384.16 -> 384 independent games are needed per matchup to estimate the win rate within approx. 5 %
 #set N=400
-runner = SimulationRunner(number_of_simulations=400, strategies=["Random", "Greedy", "SafeChoice", "MCTS"], board_dims=None)
+runner = SimulationRunner(number_of_simulations=400, strategies=["Random", "Greedy", "SafeChoice", "MCTS", "Minimax"], board_dims=None)
     
 runner.run_iteration()
 runner.save_results()
-
-
-
-        

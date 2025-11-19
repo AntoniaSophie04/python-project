@@ -154,7 +154,7 @@ class MCTSStrategy(Strategy):
     -Backpropagation: update nodes with results.
     """
     
-    def __init__(self, max_iterations=10000, time_limit=5.0):
+    def __init__(self, max_iterations=10000, time_limit=0.5):
         """
         Want to have speed and efficiency limit.
         Speed limit-> don't have to wait too long
@@ -279,7 +279,13 @@ class MCTSStrategy(Strategy):
                 break #Game over
             move = random.choice(moves)
 
+            epsilon = 0.2  #instead of pure random choice, want 80% to be greedy heuristics-> no waste of time on bad moves
 
+            if random.random() < epsilon:
+                move = random.choice(moves)
+            else:
+                #pick the move with the highest immediate value
+                move = max(moves, key=lambda m: copied_board[m[0]][m[1]])
             
             #aply random move to the temporary state
             move_value = copied_board[move[0]][move[1]]     #get value of move
