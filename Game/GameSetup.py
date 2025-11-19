@@ -10,6 +10,8 @@ from Strategies.RandomStrategy import RandomStrategy
 from Strategies.safe_choice_strategy import SafeChoiceStrategy
 from Strategies.GreedyStrategy import GreedyStrategy
 from Strategies.MCTS import MCTSStrategy
+from Strategies.minimax_f import AlphaBetaStrategy
+
 CONSTANT_SEED = 12345
 
 class GameSetup:
@@ -213,8 +215,8 @@ class GameSetup:
             ("Random Strategy", "random"),
             ("Safe Choice Strategy", "safe_choice"),
             ("Greedy Strategy", "greedy"),
-            ("Monte Carlo Tree Search Strategy", "MCTS")
-            #("Minimax", "minimax"), implement when the minmax strategy will be completed
+            ("Monte Carlo Tree Search Strategy", "MCTS"),
+            ("Minimax", "minimax")
         ]
         for text, value in rb_values:
             tk.Radiobutton(
@@ -344,6 +346,10 @@ class GameSetup:
             case "MCTS":
                 
                 return MCTSStrategy()
+            
+            case "minimax":
+                
+                return AlphaBetaStrategy()
             # Add other possible strategies here
 
             #case "minimax":

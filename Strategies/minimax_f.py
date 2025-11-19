@@ -6,7 +6,7 @@ from typing import List, Optional, Tuple
 
 # Look for "Strategy" in the parent directory (your original structure)
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from Strategy import Strategy
+from .Strategy import Strategy
 
 
 class AlphaBetaNode:
