@@ -41,17 +41,8 @@ To be continued....
 
 ## Installation
 
-To set up the project locally:
+Not sure if needed...............
 
-# Clone the repository
-```bash
-git clone https://github.com/<Sinus4096>/RC-Game.git
-cd RC-Game
-```
-# Install dependencies (if required)
-```bash
-pip install -r requirements.txt
-```
 
 ## Usage
 
