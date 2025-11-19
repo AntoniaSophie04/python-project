@@ -10,34 +10,30 @@ from Strategies.RandomStrategy import RandomStrategy
 from Strategies.safe_choice_strategy import SafeChoiceStrategy
 from Strategies.GreedyStrategy import GreedyStrategy
 from Strategies.MCTS import MCTSStrategy
+
 CONSTANT_SEED = 12345
 
 class GameSetup:
     """
-        The GameSetup class is a GUI application built with tkinter responsible for configuring
-        all parameters before starting the "RC GAME." It acts as a dedicated setup wizard,
-        allowing users to customize the game environment.
-
-        Its primary functions include:
-        1. User Interface Flow: Presenting a start page, instructions, and a detailed setup page.
-        2. Player Configuration: Allowing the user to name Player 1 and Player 2 and choose
-           if each is a Human or a Computer.
-        3. Strategy Selection: Dynamically presenting a list of available AI strategies (e.g.,
-           Random, Greedy, MCTS) for any chosen computer player.
-        4. Board Generation: Letting the user specify a board size and
-           whether to generate a new board deterministically (using a fixed seed for reproducibility)
-           or randomly, saving the generated board to a file (`boards/board.txt`).
-        5. Validation: Ensuring all required choices (both players and a board file) are made
-           before the 'Start Game' button is enabled.
-        6. Finalization: Creating the concrete `Player` objects with their chosen names and
-           strategies, destroying the setup window, and preparing to launch the main game via `GameHandler`.
-        """
+        GUI setup wizard for RC GAME (visual restyle: candy/pastel palette).
+        Logic unchanged; only styling and a small title helper added.
+    """
 
     def __init__(self):
         self.root = tk.Tk()  # own set-up window
         self.root.title("Game Start")
         self.root.geometry("420x320")
-        self.root.config(bg="#222")
+
+        # palette
+        self.COLOR_BG = "#F8C8DC"        # for background
+        self.COLOR_BTN = "#FFF4F7"       # for buttons / inputs
+        self.COLOR_TEXT = "#111111"      # for  text
+        self.ACCENT = "#E36BAE"          # primary accent
+        self.ACCENT_SOFT = "#F6C3DB"     # for outlines
+        self.ACCENT_ALT = "#B36DE3"      # secondary accent
+
+        # apply window background
+        self.root.config(bg=self.COLOR_BG)
 
         # Hold optional strategy selections for p1/p2 (string names)
         self.p1_strategy_var = tk.StringVar(value="")  # empty means not selected yet
@@ -58,6 +54,26 @@ class GameSetup:
         self.p1 = None
         self.p2 = None
 
+    def _draw_outlined_title(self, parent, text, height=60, y=30):
+        # create a canvas that stretches with the window
+        canvas = tk.Canvas(parent, height=height, bg=self.COLOR_BG, highlightthickness=0)
+        canvas.pack(fill="x", pady=(8, 6))
+
+        def draw():
+            canvas.delete("all")
+            width = canvas.winfo_width() or parent.winfo_width() or 420
+            shadow_color = "#C75A9B"
+            main_color = "#FFFFFF"
+            font = ("Helvetica", 22, "bold")
+            cx = width // 2
+            for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                canvas.create_text(cx + dx, y + dy, text=text, fill=shadow_color, font=font)
+            canvas.create_text(cx, y, text=text, fill=main_color, font=font)
+
+        # draw now and whenever the window resizes
+        canvas.bind("<Configure>", lambda e: draw())
+        parent.after(0, draw)
+        return canvas
     def run(self):
         self.root.mainloop()
         return [self.p1, self.p2]
@@ -66,33 +82,128 @@ class GameSetup:
     def show_start_page(self):
         self.clear_window()
 
-        # title
-        tk.Label(self.root, text="Welcome to the Row-Column Game!",
-                 font=("Helvetica", 20, "bold"), fg="white", bg="#222").pack(pady=40)
+        # Title (canvas with outlined text)
+        self._draw_outlined_title(self.root, "Welcome to the Row-Column Game!")
 
-        # START button
-        tk.Button(self.root, text="START", width=15, height=2, command=self.show_setup_page).pack(pady=10)
+        # START button (style)
+        tk.Button(
+            self.root, text="START", width=15, height=2,
+            command=self.show_setup_page,
+            bg=self.COLOR_BTN, fg=self.COLOR_TEXT,
+            activebackground=self.COLOR_BTN, activeforeground=self.COLOR_TEXT,
+            relief="flat", bd=1, highlightthickness=0
+        ).pack(pady=8)
 
         # Instructions button
-        tk.Button(self.root, text="Instructions", width=15, height=2, command=self.show_instructions).pack(pady=10)
+        tk.Button(
+            self.root, text="Instructions", width=15, height=2,
+            command=self.show_instructions,
+            bg=self.COLOR_BTN, fg=self.COLOR_TEXT,
+            activebackground=self.COLOR_BTN, activeforeground=self.COLOR_TEXT,
+            relief="flat", bd=1, highlightthickness=0
+        ).pack(pady=6)
 
     # switches to instruction page
     def show_instructions(self):
         self.clear_window()
-        tk.Label(self.root, text="Row-Column Game Instructions", font=("Helvetica", 20, "bold")).pack(pady=20)
-        tk.Button(self.root, text="Go back to start page", command=self.show_start_page).pack(pady=10)
+        # Responsive title
+        self._draw_outlined_title(self.root, "Row-Column Game Instructions")
+
+        # Centered "card"
+        card = tk.LabelFrame(
+            self.root, bg=self.COLOR_BG, fg=self.COLOR_TEXT,
+            text="", highlightthickness=2, labelanchor="n"
+        )
+        card.configure(highlightbackground=self.ACCENT_SOFT, highlightcolor=self.ACCENT_SOFT, highlightthickness=2)
+        card.pack(padx=24, pady=8, fill="both", expand=True)
+
+        # Inner area with padding
+        body = tk.Frame(card, bg=self.COLOR_BG)
+        body.pack(padx=16, pady=16, fill="both", expand=True)
+
+        # Scrollable text (read-only), word-wrapped to a comfortable width
+        import tkinter.scrolledtext as st
+        instructions_text = (
+            "Welcome to the Row-Column Game!\n\n"
+            "Get ready to test your logic, prediction, and a bit of luck! The goal is simple: collect "
+            "the highest score while moving through a grid of numbers, but the twist is that each move "
+            "changes what you can play next.\n\n"
+            "Rules:\n"
+            "The game board is a square grid filled with numbers. Two players take turns clicking one of "
+            "the cells to claim it, and the value in that cell is added to their score. Once a cell has "
+            "been clicked, it becomes unavailable. The crucial twist lies in the movement rule: on your "
+            "next turn, you can only choose a cell that is in the same row or the same column as the cell "
+            "your opponent just chose. The game continues until there are no valid moves left. Once the "
+            "game has ended, the player with the highest total score is the winner.\n\n"
+            "Instructions:\n"
+            "Before starting the game, you'll need to configure the following settings:\n"
+            "1. Player Names: Enter the names for Player 1 and Player 2.\n"
+            "2. Player Type: For each player, select whether they are a Human or a Computer.\n"
+            "3. Computer Strategy: If a player is set to Computer, choose their AI strategy from: Random, "
+            "Greedy, Safe Choice, or Monte Carlo Tree Search.\n"
+            "4. Board Size: Select the size of the grid.\n"
+            "5. Reproducibility (Optional): Turning on Reproducibility means the numbers in the game board "
+            "will be generated using a fixed random seed. If you enable it and keep the same board size across "
+            "multiple games, you'll get the same layout every time, making it perfect for practicing strategies! "
+            "If left off, a completely random board will be created for each new game.\n\n"
+            "You’re all set to begin your match! Best of luck, and most importantly, have fun!"
+        )
+
+        txt = st.ScrolledText(
+            body, wrap="word", height=18,
+            bg=self.COLOR_BG, fg=self.COLOR_TEXT,
+            relief="flat", bd=0, font=("Helvetica", 11)
+        )
+        txt.pack(fill="both", expand=True)
+
+        # Use the Text widget's tag system for formatting
+        txt.insert("1.0", instructions_text)
+
+        # --- Formatting tags ---
+        bright_pink = "#E36BAE"  # matches your accent color
+
+        txt.tag_add("welcome", "1.0", "1.end")
+        txt.tag_config("welcome", foreground=bright_pink, font=("Helvetica", 12, "bold"))
+
+        # further fine-tuning to make the instructions clearer
+        rules_index = txt.search("Rules:", "1.0", tk.END)
+        if rules_index:
+            txt.tag_add("rules", rules_index, f"{rules_index} lineend")
+            txt.tag_config("rules", foreground=bright_pink, font=("Helvetica", 11, "bold"))
+
+        instructions_index = txt.search("Instructions:", "1.0", tk.END)
+        if instructions_index:
+            txt.tag_add("instructions", instructions_index, f"{instructions_index} lineend")
+            txt.tag_config("instructions", foreground=bright_pink, font=("Helvetica", 11, "bold"))
+
+
+        end_index = txt.search("Best of luck", "1.0", tk.END)
+        if end_index:
+            txt.tag_add("ending", end_index, f"{end_index} lineend")
+            txt.tag_config("ending", foreground=bright_pink, font=("Helvetica", 11, "bold"))
+
+        txt.config(state="disabled")  # read-only
+
+        # Footer
+        tk.Button(
+            self.root, text="Go back to start page",
+            command=self.show_start_page,
+            bg=self.COLOR_BTN, fg=self.COLOR_TEXT,
+            activebackground=self.COLOR_BTN, activeforeground=self.COLOR_TEXT,
+            relief="flat", bd=1, highlightthickness=0,
+            width=20, height=2, font=("Helvetica", 11, "bold")
+        ).pack(pady=10)
 
     # switches to setup page
     def show_setup_page(self):
         self.clear_window()
 
-        # Title
-        title = tk.Label(self.root, text="Row-Column Game Setup", font=("Helvetica", 20, "bold"), bg="#222", fg="white")
-        title.pack(pady=10)
+        # Title (canvas)
+        self._draw_outlined_title(self.root, "Row-Column Game Setup")
 
         # Container (Player 1 vs. Player 2)
-        container = tk.Frame(self.root, bg="#222")
-        container.pack(expand=True, fill="both", padx=12)
+        container = tk.Frame(self.root, bg=self.COLOR_BG)
+        container.pack(fill="x", padx=20, pady=(0, 8))  # <- no expand=True
         container.grid_columnconfigure(0, weight=1, minsize=180)
         container.grid_columnconfigure(1, weight=0, minsize=60)
         container.grid_columnconfigure(2, weight=1, minsize=180)
@@ -104,92 +215,140 @@ class GameSetup:
         # Entry Player 1
         tk.Entry(
             container, textvariable=self.p1_name_var, font=("Arial", 16),
-            fg="white", bg="#333", insertbackground="white", justify="center", width=14
+            fg=self.COLOR_TEXT, bg=self.COLOR_BTN, insertbackground=self.COLOR_TEXT,
+            justify="center", width=14, relief="flat", bd=1, highlightthickness=1,
+            highlightbackground=self.ACCENT_SOFT
         ).grid(row=0, column=0, pady=(10, 6))
 
         # "VS."
-        tk.Label(container, text="VS.", font=("Arial", 16, "bold"), fg="white", bg="#222").grid(row=0, column=1,
-                                                                                                pady=(10, 6))
+        tk.Label(
+            container, text="VS.", font=("Arial", 16, "bold"),
+            fg=self.COLOR_TEXT, bg=self.COLOR_BG
+        ).grid(row=0, column=1, pady=(10, 6))
 
         # Entry Player 2
         tk.Entry(
             container, textvariable=self.p2_name_var, font=("Arial", 16),
-            fg="white", bg="#333", insertbackground="white", justify="center", width=14
+            fg=self.COLOR_TEXT, bg=self.COLOR_BTN, insertbackground=self.COLOR_TEXT,
+            justify="center", width=14, relief="flat", bd=1, highlightthickness=1,
+            highlightbackground=self.ACCENT_SOFT
         ).grid(row=0, column=2, pady=(10, 6))
 
-        # --- Player 1 choice buttons ---
-        self.p1_human = tk.Button(container, text="Human", width=12,
-                                  command=lambda: self.select_player("p1", "human"))
+        # Player 1 choice buttons
+        self.p1_human = tk.Button(
+            container, text="Human", width=12,
+            command=lambda: self.select_player("p1", "human"),
+            bg=self.COLOR_BTN, fg=self.COLOR_TEXT,
+            activebackground=self.COLOR_BTN, activeforeground=self.COLOR_TEXT,
+            relief="flat", bd=1, highlightthickness=0
+        )
         self.p1_human.grid(row=1, column=0, pady=5)
 
-        self.p1_computer = tk.Button(container, text="Computer", width=12,
-                                     command=lambda: self.select_player("p1", "computer"))
+        self.p1_computer = tk.Button(
+            container, text="Computer", width=12,
+            command=lambda: self.select_player("p1", "computer"),
+            bg=self.COLOR_BTN, fg=self.COLOR_TEXT,
+            activebackground=self.COLOR_BTN, activeforeground=self.COLOR_TEXT,
+            relief="flat", bd=1, highlightthickness=0
+        )
         self.p1_computer.grid(row=2, column=0, pady=5)
 
-        # Placeholder for P1 strategy buttons (created only if Computer is selected)
-        self.p1_strategy_frame = tk.Frame(container, bg="#222")
+        # Placeholder for P1 strategies
+        self.p1_strategy_frame = tk.Frame(container, bg=self.COLOR_BG)
         self.p1_strategy_frame.grid(row=3, column=0, pady=(0, 10))
 
-        # --- Player 2 choice buttons ---
-        self.p2_human = tk.Button(container, text="Human", width=12,
-                                  command=lambda: self.select_player("p2", "human"))
+        # Player 2 choice buttons
+        self.p2_human = tk.Button(
+            container, text="Human", width=12,
+            command=lambda: self.select_player("p2", "human"),
+            bg=self.COLOR_BTN, fg=self.COLOR_TEXT,
+            activebackground=self.COLOR_BTN, activeforeground=self.COLOR_TEXT,
+            relief="flat", bd=1, highlightthickness=0
+        )
         self.p2_human.grid(row=1, column=2, pady=5)
 
-        self.p2_computer = tk.Button(container, text="Computer", width=12,
-                                     command=lambda: self.select_player("p2", "computer"))
+        self.p2_computer = tk.Button(
+            container, text="Computer", width=12,
+            command=lambda: self.select_player("p2", "computer"),
+            bg=self.COLOR_BTN, fg=self.COLOR_TEXT,
+            activebackground=self.COLOR_BTN, activeforeground=self.COLOR_TEXT,
+            relief="flat", bd=1, highlightthickness=0
+        )
         self.p2_computer.grid(row=2, column=2, pady=5)
 
-        # Placeholder for P2 strategy buttons
-        self.p2_strategy_frame = tk.Frame(container, bg="#222")
+        # Placeholder for P2 strategies
+        self.p2_strategy_frame = tk.Frame(container, bg=self.COLOR_BG)
         self.p2_strategy_frame.grid(row=3, column=2, pady=(0, 10))
 
-        # Board Setup 
-        board_frame = tk.LabelFrame(self.root, text="Board Setup", fg="white", bg="#222",
-                                    font=("Arial", 11, "bold"), labelanchor="n")
-        board_frame.configure(highlightbackground="#444", highlightcolor="#444")
-        board_frame.pack(fill="x", padx=12, pady=(6, 8))
+        # Board Setup "card"
+        board_frame = tk.LabelFrame(
+            self.root, text="Board Setup", fg=self.COLOR_TEXT, bg=self.COLOR_BG,
+            font=("Arial", 13, "bold"), labelanchor="n"
+        )
+        board_frame.configure(highlightbackground=self.ACCENT_SOFT, highlightcolor=self.ACCENT_SOFT,
+                              highlightthickness=2)
+        board_frame.pack(fill="x", padx=40, pady=(6, 12))  # <- wider + centered
 
-        inner = tk.Frame(board_frame, bg="#222")
-        inner.pack(padx=8, pady=8, fill="x")
+        inner = tk.Frame(board_frame, bg=self.COLOR_BG)
+        inner.pack(padx=16, pady=16, fill="x")  # <- more breathing room
 
-        tk.Label(inner, text="Pick the board size (1–10):", fg="white", bg="#222").grid(row=0, column=0, sticky="e", pady=2, padx=4)
-        tk.Spinbox(inner, from_=1, to=10, textvariable=self.board_size_var, width=4,
-                   justify="center").grid(row=0, column=1, sticky="w", pady=2)
+        tk.Label(
+            inner, text="Pick the board size (1–10):",
+            fg=self.COLOR_TEXT, bg=self.COLOR_BG, font=("Arial", 11)
+        ).grid(row=0, column=0, sticky="e", pady=4, padx=6)
 
-        # Checkbox: Reproducibility (not if you randomly create the board)
+        tk.Spinbox(
+            inner, from_=1, to=10, textvariable=self.board_size_var, width=4,
+            justify="center", fg=self.COLOR_TEXT
+        ).grid(row=0, column=1, sticky="w", pady=4)
+
         self.repro_checkbox = tk.Checkbutton(
-        inner, text="Reproducibility (fixed seed)", variable=self.reproducible_var,
-        bg="#222", fg="white", activebackground="#222", activeforeground="white", selectcolor="#333"
+            inner, text="Reproducibility (fixed seed)", variable=self.reproducible_var,
+            bg=self.COLOR_BG, fg=self.COLOR_TEXT,
+            activebackground=self.COLOR_BG, activeforeground=self.COLOR_TEXT,
+            selectcolor=self.COLOR_BTN
         )
-        self.repro_checkbox.grid(row=0, column=2, columnspan=2, sticky="w", padx=12)
+        self.repro_checkbox.grid(row=0, column=2, columnspan=2, sticky="w", padx=16)
 
-        # Buttons
-        btns = tk.Frame(inner, bg="#222")
-        btns.grid(row=1, column=0, columnspan=3, sticky="ew", pady=(8, 0))
-        btns.grid_columnconfigure(0, weight=0)  # left
-        btns.grid_columnconfigure(1, weight=1)  # spacer
-        btns.grid_columnconfigure(2, weight=0)  # right
+        # Buttons row
+        btns = tk.Frame(inner, bg=self.COLOR_BG)
+        btns.grid(row=1, column=0, columnspan=4, sticky="ew", pady=(12, 0))
+        btns.grid_columnconfigure(0, weight=0)
+        btns.grid_columnconfigure(1, weight=1)
+        btns.grid_columnconfigure(2, weight=0)
 
-        btn = tk.Button(
+        tk.Button(
             btns, text="Create board with chosen size",
-            command=lambda: self.generate_board()
+            command=lambda: self.generate_board(),
+            bg=self.COLOR_BTN, fg=self.COLOR_TEXT,
+            activebackground=self.COLOR_BTN, activeforeground=self.COLOR_TEXT,
+            relief="flat", bd=1, highlightthickness=0
+        ).grid(row=0, column=0, sticky="w", padx=6)
+
+        # footer buttons
+        footer = tk.Frame(self.root, bg=self.COLOR_BG)
+        footer.pack(pady=(6, 12))
+
+        tk.Button(
+            footer, text="Go back to start page", command=self.show_start_page,
+            bg=self.COLOR_BTN, fg=self.COLOR_TEXT,
+            activebackground=self.COLOR_BTN, activeforeground=self.COLOR_TEXT,
+            relief="flat", bd=1, highlightthickness=0,
+            width=20, height=2, font=("Helvetica", 11, "bold")
+        ).pack(side="left", padx=10)
+
+        self.start_button = tk.Button(
+            footer, text="Start Game", command=self.finish_setup, state="disabled",
+            bg=self.COLOR_BTN, fg=self.COLOR_TEXT,
+            activebackground=self.COLOR_BTN, activeforeground=self.COLOR_TEXT,
+            relief="flat", bd=1, highlightthickness=0,
+            width=20, height=2, font=("Helvetica", 11, "bold")
         )
-        btn.grid(row=0, column=0, sticky="w", padx=4)
+        self.start_button.pack(side="left", padx=10)
 
-        #tk.Label(board_frame, fg="#ccc", bg="#222").pack(pady=(6, 2))
-
-        # Go back button
-        tk.Button(self.root, text="Go back to start page", command=self.show_start_page).pack(pady=(4, 6))
-
-        # Start the game button (disabled until all choices are valid)
-        self.start_button = tk.Button(self.root, text="Start Game", command=self.finish_setup, state="disabled")
-        self.start_button.pack(pady=(0, 10))
-
-        # Re-check whenever a strategy selection changes (enables Start when valid)
+        # Re-check whenever strategy selection changes
         self.p1_strategy_var.trace_add("write", lambda *_: self.update_start_button())
         self.p2_strategy_var.trace_add("write", lambda *_: self.update_start_button())
-
-        
 
     # Creates strategy radio buttons dynamically when Computer is chosen
     def show_strategy_options(self, which_player: str):
@@ -204,23 +363,25 @@ class GameSetup:
         for w in frame.winfo_children():
             w.destroy()
 
-        # Label to explain the requirement
-        tk.Label(frame, text="Select strategy:", fg="white", bg="#222", font=("Arial", 10, "bold")).pack(pady=(2, 2))
+        # Label
+        tk.Label(
+            frame, text="Select strategy:", fg=self.COLOR_TEXT, bg=self.COLOR_BG, font=("Arial", 10, "bold")
+        ).pack(pady=(2, 2))
 
-        # RadioButtons: save the "name" of the strategy in the StringVar
-        # Note: you asked to pass the strategy name to Player; we keep plain strings here.
+        # RadioButtons
         rb_values = [
             ("Random Strategy", "random"),
             ("Safe Choice Strategy", "safe_choice"),
             ("Greedy Strategy", "greedy"),
             ("Monte Carlo Tree Search Strategy", "MCTS")
-            #("Minimax", "minimax"), implement when the minmax strategy will be completed
         ]
         for text, value in rb_values:
             tk.Radiobutton(
                 frame, text=text, variable=var, value=value,
-                bg="#222", fg="white", selectcolor="#333", activebackground="#222", activeforeground="white",
-                command=self.update_start_button  # Re-evaluate when a choice is made
+                bg=self.COLOR_BG, fg=self.COLOR_TEXT,
+                selectcolor=self.COLOR_BTN,
+                activebackground=self.COLOR_BG, activeforeground=self.COLOR_TEXT,
+                command=self.update_start_button
             ).pack(anchor="w")
 
     # DOES NOT store player objects. Disables the opposite button and shows/hides strategy options.
@@ -228,16 +389,14 @@ class GameSetup:
         if player == "p1":
             self.p1_type = choice
             if choice == "human":
-                # Disable the opposite button; reset and hide any previous strategy selection for p1
                 self.p1_computer.config(state="disabled")
                 self.p1_human.config(relief="sunken")
-                self.p1_strategy_var.set("")  # clear selection if switching from computer to human
+                self.p1_strategy_var.set("")
                 for w in self.p1_strategy_frame.winfo_children():
                     w.destroy()
             else:
                 self.p1_human.config(state="disabled")
                 self.p1_computer.config(relief="sunken")
-                # Show strategy options for player 1
                 self.show_strategy_options("p1")
         else:  # p2
             if choice == "human":
@@ -249,10 +408,8 @@ class GameSetup:
             else:
                 self.p2_human.config(state="disabled")
                 self.p2_computer.config(relief="sunken")
-                # Show strategy options for player 2
                 self.show_strategy_options("p2")
 
-        # After any selection, update the Start button availability
         self.update_start_button()
 
     def update_start_button(self):
@@ -273,10 +430,8 @@ class GameSetup:
         )
         # Equivalent explicit logic:
         if self.p1_computer["state"] == "disabled" and self.p1_human["state"] == "normal":
-            # human chosen -> OK regardless of strategy
             p1_ok = True
         elif self.p1_human["state"] == "disabled" and self.p1_computer["state"] == "normal":
-            # computer chosen -> need strategy
             p1_ok = bool(self.p1_strategy_var.get())
 
         if self.p2_computer["state"] == "disabled" and self.p2_human["state"] == "normal":
@@ -284,7 +439,7 @@ class GameSetup:
         elif self.p2_human["state"] == "disabled" and self.p2_computer["state"] == "normal":
             p2_ok = bool(self.p2_strategy_var.get())
         else:
-            p2_ok = False  # nothing chosen yet
+            p2_ok = False
 
         ready_board = bool(self.board_file)
 
@@ -298,74 +453,55 @@ class GameSetup:
         name1 = (self.p1_name_var.get() or "Player 1").strip() or "Player 1"
         name2 = (self.p2_name_var.get() or "Player 2").strip() or "Player 2"
 
-        # Deduce P1: "Human" chosen when p1_computer is disabled and p1_human is normal (your previous rule)
         if self.p1_computer["state"] == "disabled" and self.p1_human["state"] == "normal":
             p1 = Player.Player(name=name1, is_human=True)
         else:
-            # Computer -> pass the strategy name string
             p1_strategy_name = self.p1_strategy_var.get()
             strategy1 = self.create_strategy(p1_strategy_name)
             p1 = Player.Player(name=name1, is_human=False, strategy=strategy1)
 
-        # Deduce P2
         if self.p2_computer["state"] == "disabled" and self.p2_human["state"] == "normal":
             p2 = Player.Player(name=name2, is_human=True)
         else:
             p2_strategy_name = self.p2_strategy_var.get()
-            strategy2=self.create_strategy(p2_strategy_name)
+            strategy2 = self.create_strategy(p2_strategy_name)
             p2 = Player.Player(name=name2, is_human=False, strategy=strategy2)
 
         return p1, p2
 
     def finish_setup(self):
-        # Create players now
         self.p1, self.p2 = self.create_players()
-        # Close setup window
         self.root.destroy()
 
     def clear_window(self):
         for widget in self.root.winfo_children():
             widget.destroy()
 
-    def create_strategy(self,strategy_name):
+    def create_strategy(self, strategy_name):
         match strategy_name:
             case "random":
-
                 return RandomStrategy()
-
             case "safe_choice":
-
                 return SafeChoiceStrategy()
-
             case "greedy":
-
                 return GreedyStrategy()
-            
             case "MCTS":
-                
                 return MCTSStrategy()
-            # Add other possible strategies here
-
-            #case "minimax":
-
-                #return MinimaxStrategy()
-
             case _:
-                # default case (if none of the above match)
-                raise ValueError(f"Unknown strategy: {strategy_name}")      
+                raise ValueError(f"Unknown strategy: {strategy_name}")
 
     # Generates a quadratic Board according to the board size input
     def generate_board(self):
-        try: 
+        try:
             size = int(self.board_size_var.get())
-        except ValueError: 
+        except ValueError:
             self.board_file = None
             self.update_start_button()
             return
-        
-        if self.repro_checkbox: 
+
+        if self.repro_checkbox:
             self.repro_checkbox.config(state="normal")
-        
+
         rnd = random.Random(CONSTANT_SEED) if self.reproducible_var.get() else random.Random()
 
         matrix = [[rnd.randint(1,9) for _ in range(size)] for _ in range(size)]
@@ -373,18 +509,12 @@ class GameSetup:
         os.makedirs(out_dir, exist_ok=True)
         path = os.path.join(out_dir, "board.txt")
 
-        with open(path, "w", encoding="utf-8") as file: 
-            for row in matrix: 
+        with open(path, "w", encoding="utf-8") as file:
+            for row in matrix:
                 file.write(" ".join(map(str, row)) + "\n")
 
         if self.repro_checkbox:
-            self.repro_checkbox.config(state="disabled")        
-        
+            self.repro_checkbox.config(state="disabled")
+
         self.board_file = path
         self.update_start_button()
-
-        
-
-        
-
-    

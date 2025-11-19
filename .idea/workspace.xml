@@ -4,10 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="97a8b81d-f798-4f45-a9f5-12eb1986ab0f" name="Changes" comment="Creating the GreedyStrategy">
+    <list default="true" id="97a8b81d-f798-4f45-a9f5-12eb1986ab0f" name="Changes" comment="fixed the human vs computer problem">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Game/Board.py" beforeDir="false" afterPath="$PROJECT_DIR$/Game/Board.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Game/GameHandler.py" beforeDir="false" afterPath="$PROJECT_DIR$/Game/GameHandler.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Game/GameSetup.py" beforeDir="false" afterPath="$PROJECT_DIR$/Game/GameSetup.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/boards/board.txt" beforeDir="false" afterPath="$PROJECT_DIR$/boards/board.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -214,7 +214,15 @@
       <option name="project" value="LOCAL" />
       <updated>1763112860013</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="fixed the human vs computer problem">
+      <option name="closed" value="true" />
+      <created>1763549557896</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1763549557896</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -226,12 +234,13 @@
     <MESSAGE value="New code - I tried to add the class Strategy and to make it possible to play with the computer and human and both. There are some mistakes ..." />
     <MESSAGE value="made the output of gamesetup an object type person. made possible to select strategies and change the name of the player. made better when a computer is player one." />
     <MESSAGE value="Creating the GreedyStrategy" />
-    <option name="LAST_COMMIT_MESSAGE" value="Creating the GreedyStrategy" />
+    <MESSAGE value="fixed the human vs computer problem" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed the human vs computer problem" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/python_project$fileReading.coverage" NAME="fileReading Coverage Results" MODIFIED="1762341064623" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/python_project$GameHandler.coverage" NAME="GameHandler Coverage Results" MODIFIED="1762610224688" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/python_project$main.coverage" NAME="main Coverage Results" MODIFIED="1763549334467" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/python_project$main.coverage" NAME="main Coverage Results" MODIFIED="1763559906022" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/python_project$GameSetup.coverage" NAME="GameSetup Coverage Results" MODIFIED="1762601839258" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
