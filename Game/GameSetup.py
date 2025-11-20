@@ -75,6 +75,7 @@ class GameSetup:
         canvas.bind("<Configure>", lambda e: draw())
         parent.after(0, draw)
         return canvas
+    
     def run(self):
         self.root.mainloop()
         return [self.p1, self.p2]
@@ -294,12 +295,12 @@ class GameSetup:
         inner.pack(padx=16, pady=16, fill="x")  # <- more breathing room
 
         tk.Label(
-            inner, text="Pick the board size (1–10):",
+            inner, text="Pick the board size (2–10):",
             fg=self.COLOR_TEXT, bg=self.COLOR_BG, font=("Arial", 11)
         ).grid(row=0, column=0, sticky="e", pady=4, padx=6)
 
         tk.Spinbox(
-            inner, from_=1, to=10, textvariable=self.board_size_var, width=4,
+            inner, from_=2, to=10, textvariable=self.board_size_var, width=4,
             justify="center", fg=self.COLOR_TEXT
         ).grid(row=0, column=1, sticky="w", pady=4)
 
