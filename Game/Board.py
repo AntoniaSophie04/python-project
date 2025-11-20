@@ -14,53 +14,75 @@ class Board:
         """
 
     def __init__(self, game_handler):
-        # === References ===
+        # References
         # direct reference to GameHandler
         self.game_handler = game_handler
-
         self.root = game_handler.root
 
+        # color palette
+        self.COLOR_BG = "#F8C8DC"  # for board
+        self.COLOR_BTN = "#FFF4F7"  # for buttons
+        self.COLOR_TEXT = "#111111"  # for text
+        self.ACCENT_P1 = "#E36BAE"  # player one
+        self.ACCENT_P1_SOFT = "#F6C3DB"  # soft border p1
+        self.ACCENT_P2 = "#B36DE3"  # player 2
+        self.ACCENT_P2_SOFT = "#D9C3F6"  # soft border p2
+        self.COLOR_CLICKED = "#D988B9"  # for clicked cells
 
-        # === Setup window ===
-        self.root.geometry("600x600")
-        self.root.config(bg="#222")
+        #  Setup window
+        try:
+            self.root.state("zoomed")  # Windows fullscreen
+        except Exception:
+            self.root.attributes("-fullscreen", True)
 
-        # === Title ===
-        title = tk.Label(
-            self.root,
-            text="RC GAME",
-            font=("Helvetica", 20, "bold"),
-            fg="white",
-            bg="#222"
+
+        self.root.config(bg=self.COLOR_BG)
+
+        #  Title
+        self.title_canvas = tk.Canvas(
+            self.root, width=600, height=70, bg=self.COLOR_BG, highlightthickness=0
         )
-        title.pack(pady=10)
+        self.title_canvas.pack(pady=(8, 4))
+        self._draw_outlined_title(self.title_canvas, "RC GAME", y=35)
 
-        # === Scores ===
-        score_frame = tk.Frame(self.root, bg="#222")
-        score_frame.pack(side=tk.TOP, fill=tk.X, pady=5)
+        #  Scores
+        score_frame = tk.Frame(self.root, bg=self.COLOR_BG)
+        score_frame.pack(side=tk.TOP, fill=tk.X, pady=6)
+
+
+        # wrapper with colorful frame
+        self.p1_wrap = tk.Frame(score_frame, bg=self.ACCENT_P1_SOFT)
+        self.p1_wrap.pack(side=tk.LEFT, padx=20)
 
         self.player1_label = tk.Label(
-            score_frame,
+            self.p1_wrap,
             text=f"{self.game_handler.players[0].getName()}: 0",
-            font=("Helvetica", 14),
-            bg="#444",
-            fg="white",
-            width=15
+            font=("Helvetica", 14, "bold"),
+            bg=self.COLOR_BG,
+            fg=self.COLOR_TEXT,
+            width=16,
+            padx=10, pady=4
         )
-        self.player1_label.pack(side=tk.LEFT, padx=20)
+        self.player1_label.pack()
+
+        # colorful wrapper for P2
+        self.p2_wrap = tk.Frame(score_frame, bg=self.ACCENT_P2_SOFT)
+        self.p2_wrap.pack(side=tk.RIGHT, padx=20)
 
         self.player2_label = tk.Label(
-            score_frame,
+            self.p2_wrap,
             text=f"{self.game_handler.players[1].getName()}: 0",
-            font=("Helvetica", 14),
-            bg="#444",
-            fg="white",
-            width=15
+            font=("Helvetica", 14, "bold"),
+            bg=self.COLOR_BG,
+            fg=self.COLOR_TEXT,
+            width=16,
+            padx=10, pady=4
         )
-        self.player2_label.pack(side=tk.RIGHT, padx=20)
+        self.player2_label.pack()
 
-        # === Grid ===
-        self.grid_frame = tk.Frame(self.root, bg="#222")
+
+        # Grid
+        self.grid_frame = tk.Frame(self.root, bg=self.COLOR_BG)
         self.grid_frame.pack(expand=True)
 
         self.grid_buttons = []
@@ -69,23 +91,46 @@ class Board:
         # Highlights the first player
         self.highlight_current_player(self.game_handler.current_player)
 
-    # === Grid creation ===
+    def _draw_outlined_title(self, canvas, text, y=35):
+        # border
+        shadow_color = "#C75A9B"  # shadow
+        main_color = "#FFFFFF"  # white
+        font = ("Helvetica", 28, "bold")
+
+        for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+            canvas.create_text(300 + dx, y + dy, text=text, fill=shadow_color, font=font)
+        canvas.create_text(300, y, text=text, fill=main_color, font=font)
+
+
+    #  Grid creation
     def create_grid(self, size):
+        #  dynamic sizing so big boards still fit on screen
+        if size <= 6:
+            btn_w, btn_h, fsize, pad = 8, 3, 16, 3
+        elif size <= 8:
+            btn_w, btn_h, fsize, pad = 6, 2, 14, 2
+        else:  # for 9x9 or 10x10 boards
+            btn_w, btn_h, fsize, pad = 4, 2, 12, 1
+
         for r in range(size):
             row_buttons = []
             for c in range(size):
                 btn = tk.Button(
- self.grid_frame,
-    text=f"{self.game_handler.matrix[r][c]}",
-    width=8,
-    height=3,
-    bg="#ddd",         # light gray background
-    fg="black",        # black numbers
-    font=("Helvetica", 16, "bold"),  # makes numbers stand out more
-    command=lambda row=r, col=c: self.cell_clicked(row, col)
-)
-
-                btn.grid(row=r, column=c, padx=5, pady=5)
+                    self.grid_frame,
+                    text=f"{self.game_handler.matrix[r][c]}",
+                    width=btn_w,
+                    height=btn_h,
+                    bg=self.COLOR_BTN,
+                    fg=self.COLOR_TEXT,
+                    activebackground=self.COLOR_BTN,
+                    activeforeground=self.COLOR_TEXT,
+                    relief="flat",
+                    bd=1,
+                    highlightthickness=0,
+                    font=("Helvetica", fsize, "bold"),
+                    command=lambda row=r, col=c: self.cell_clicked(row, col)
+                )
+                btn.grid(row=r, column=c, padx=pad, pady=pad)
                 row_buttons.append(btn)
             self.grid_buttons.append(row_buttons)
 
@@ -103,18 +148,17 @@ class Board:
     # === Highlight the current player ===
     def highlight_current_player(self, current):
         if current == 0:
-            self.player1_label.config(bg="#666")
-            self.player2_label.config(bg="#444")
+            self.p1_wrap.config(bg=self.ACCENT_P1)  #active
+            self.p2_wrap.config(bg=self.ACCENT_P2_SOFT)  #inactive
         else:
-            self.player1_label.config(bg="#444")
-            self.player2_label.config(bg="#666")
+            self.p1_wrap.config(bg=self.ACCENT_P1_SOFT)
+            self.p2_wrap.config(bg=self.ACCENT_P2)
 
     # === Starting the window ===
     def set_visible(self):
         self.root.mainloop()
 
     def update_active_buttons(self, active_row, active_col):
-        print('update bottoni attivi')
         """
         Turns off all buttons except for those in the same row or column
         of the clicked cell (if not disabled or marked.
@@ -123,20 +167,19 @@ class Board:
             for c in range(self.game_handler.dimMat):
                 button = self.grid_buttons[r][c]
 
-                # se la cella è già cliccata, resta disabilitata
+                # if the cell is already clicked, keep it disabled
                 if self.game_handler.matrix[r][c] == "-":
-                    button.config(state="disabled")
-                # se è nella stessa riga o colonna, la lasciamo attiva
+                    button.config(state="disabled", bg=self.COLOR_CLICKED)
+
+                # if it's in the same row or column, keep it active
                 elif r == active_row or c == active_col:
                     button.config(state="normal")
-                # altrimenti la disattiviamo
+                # otherwise, disable it
                 else:
                     button.config(state="disabled")
 
     def disable_all_buttons(self):
-        print('disabilita tutti i pulsanti')
         for r in range(self.game_handler.dimMat):
             for c in range(self.game_handler.dimMat):
                 button = self.grid_buttons[r][c]
                 button.config(state="disabled")
-                print(f'ha disabilitato il bottone {r,c}')

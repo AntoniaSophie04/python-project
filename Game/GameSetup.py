@@ -23,7 +23,11 @@ class GameSetup:
     def __init__(self):
         self.root = tk.Tk()  # own set-up window
         self.root.title("Game Start")
-        self.root.geometry("420x320")
+        #Open fullscreen on any OS
+        try:
+            self.root.state("zoomed")  # Windows
+        except Exception:
+            self.root.attributes("-fullscreen", True)  # macOS/Linux fallback
 
         # palette
         self.COLOR_BG = "#F8C8DC"        # for background
@@ -88,22 +92,31 @@ class GameSetup:
         self._draw_outlined_title(self.root, "Welcome to the Row-Column Game!")
 
         # START button (style)
+        # Center a frame vertically and horizontally for buttons
+        button_frame = tk.Frame(self.root, bg=self.COLOR_BG)
+        button_frame.pack(expand=True)
+
+        # START button
         tk.Button(
-            self.root, text="START", width=15, height=2,
+            button_frame, text="START",
+            width=20, height=3,
+            font=("Helvetica", 14, "bold"),
             command=self.show_setup_page,
-            bg=self.COLOR_BTN, fg=self.COLOR_TEXT,
+            bg=self.COLOR_BTN, fg="#E36BAE",
             activebackground=self.COLOR_BTN, activeforeground=self.COLOR_TEXT,
             relief="flat", bd=1, highlightthickness=0
-        ).pack(pady=8)
+        ).pack(pady=15)
 
-        # Instructions button
+        # Instructions button (larger and centered)
         tk.Button(
-            self.root, text="Instructions", width=15, height=2,
+            button_frame, text="Instructions",
+            width=20, height=3,
+            font=("Helvetica", 14, "bold"),
             command=self.show_instructions,
             bg=self.COLOR_BTN, fg=self.COLOR_TEXT,
             activebackground=self.COLOR_BTN, activeforeground=self.COLOR_TEXT,
             relief="flat", bd=1, highlightthickness=0
-        ).pack(pady=6)
+        ).pack(pady=10)
 
     # switches to instruction page
     def show_instructions(self):
@@ -162,7 +175,7 @@ class GameSetup:
         txt.insert("1.0", instructions_text)
 
         # --- Formatting tags ---
-        bright_pink = "#E36BAE"  # matches your accent color
+        bright_pink = "#E36BAE"
 
         txt.tag_add("welcome", "1.0", "1.end")
         txt.tag_config("welcome", foreground=bright_pink, font=("Helvetica", 12, "bold"))
@@ -341,7 +354,7 @@ class GameSetup:
 
         self.start_button = tk.Button(
             footer, text="Start Game", command=self.finish_setup, state="disabled",
-            bg=self.COLOR_BTN, fg=self.COLOR_TEXT,
+            bg=self.COLOR_BTN, fg="#E36BAE",
             activebackground=self.COLOR_BTN, activeforeground=self.COLOR_TEXT,
             relief="flat", bd=1, highlightthickness=0,
             width=20, height=2, font=("Helvetica", 11, "bold")
