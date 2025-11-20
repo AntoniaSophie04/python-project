@@ -23,7 +23,11 @@ class GameSetup:
     def __init__(self):
         self.root = tk.Tk()  # own set-up window
         self.root.title("Game Start")
-        self.root.geometry("420x320")
+        #Open fullscreen on any OS
+        try:
+            self.root.state("zoomed")  # Windows
+        except Exception:
+            self.root.attributes("-fullscreen", True)  # macOS/Linux fallback
 
         # palette
         self.COLOR_BG = "#F8C8DC"        # for background
@@ -75,6 +79,7 @@ class GameSetup:
         canvas.bind("<Configure>", lambda e: draw())
         parent.after(0, draw)
         return canvas
+    
     def run(self):
         self.root.mainloop()
         return [self.p1, self.p2]
@@ -87,22 +92,31 @@ class GameSetup:
         self._draw_outlined_title(self.root, "Welcome to the Row-Column Game!")
 
         # START button (style)
+        # Center a frame vertically and horizontally for buttons
+        button_frame = tk.Frame(self.root, bg=self.COLOR_BG)
+        button_frame.pack(expand=True)
+
+        # START button
         tk.Button(
-            self.root, text="START", width=15, height=2,
+            button_frame, text="START",
+            width=20, height=3,
+            font=("Helvetica", 14, "bold"),
             command=self.show_setup_page,
-            bg=self.COLOR_BTN, fg=self.COLOR_TEXT,
+            bg=self.COLOR_BTN, fg="#E36BAE",
             activebackground=self.COLOR_BTN, activeforeground=self.COLOR_TEXT,
             relief="flat", bd=1, highlightthickness=0
-        ).pack(pady=8)
+        ).pack(pady=15)
 
-        # Instructions button
+        # Instructions button (larger and centered)
         tk.Button(
-            self.root, text="Instructions", width=15, height=2,
+            button_frame, text="Instructions",
+            width=20, height=3,
+            font=("Helvetica", 14, "bold"),
             command=self.show_instructions,
             bg=self.COLOR_BTN, fg=self.COLOR_TEXT,
             activebackground=self.COLOR_BTN, activeforeground=self.COLOR_TEXT,
             relief="flat", bd=1, highlightthickness=0
-        ).pack(pady=6)
+        ).pack(pady=10)
 
     # switches to instruction page
     def show_instructions(self):
@@ -137,7 +151,7 @@ class GameSetup:
             "your opponent just chose. The game continues until there are no valid moves left. Once the "
             "game has ended, the player with the highest total score is the winner.\n\n"
             "Instructions:\n"
-            "Before starting the game, you'll need to configure the following settings:\n"
+            "Before starting the game, you'll need to configure the following settings:\n\n"
             "1. Player Names: Enter the names for Player 1 and Player 2.\n"
             "2. Player Type: For each player, select whether they are a Human or a Computer.\n"
             "3. Computer Strategy: If a player is set to Computer, choose their AI strategy from: Random, "
@@ -153,7 +167,7 @@ class GameSetup:
         txt = st.ScrolledText(
             body, wrap="word", height=18,
             bg=self.COLOR_BG, fg=self.COLOR_TEXT,
-            relief="flat", bd=0, font=("Helvetica", 11)
+            relief="flat", bd=0, font=("Helvetica", 14)
         )
         txt.pack(fill="both", expand=True)
 
@@ -161,27 +175,27 @@ class GameSetup:
         txt.insert("1.0", instructions_text)
 
         # --- Formatting tags ---
-        bright_pink = "#E36BAE"  # matches your accent color
+        bright_pink = "#E36BAE"
 
         txt.tag_add("welcome", "1.0", "1.end")
-        txt.tag_config("welcome", foreground=bright_pink, font=("Helvetica", 12, "bold"))
+        txt.tag_config("welcome", foreground=bright_pink, font=("Helvetica", 18, "bold"))
 
         # further fine-tuning to make the instructions clearer
         rules_index = txt.search("Rules:", "1.0", tk.END)
         if rules_index:
             txt.tag_add("rules", rules_index, f"{rules_index} lineend")
-            txt.tag_config("rules", foreground=bright_pink, font=("Helvetica", 11, "bold"))
+            txt.tag_config("rules", foreground=bright_pink, font=("Helvetica", 16, "bold"))
 
         instructions_index = txt.search("Instructions:", "1.0", tk.END)
         if instructions_index:
             txt.tag_add("instructions", instructions_index, f"{instructions_index} lineend")
-            txt.tag_config("instructions", foreground=bright_pink, font=("Helvetica", 11, "bold"))
+            txt.tag_config("instructions", foreground=bright_pink, font=("Helvetica", 16, "bold"))
 
 
         end_index = txt.search("Best of luck", "1.0", tk.END)
         if end_index:
             txt.tag_add("ending", end_index, f"{end_index} lineend")
-            txt.tag_config("ending", foreground=bright_pink, font=("Helvetica", 11, "bold"))
+            txt.tag_config("ending", foreground=bright_pink, font=("Helvetica", 14, "bold"))
 
         txt.config(state="disabled")  # read-only
 
@@ -294,12 +308,12 @@ class GameSetup:
         inner.pack(padx=16, pady=16, fill="x")  # <- more breathing room
 
         tk.Label(
-            inner, text="Pick the board size (1–10):",
+            inner, text="Pick the board size (2–10):",
             fg=self.COLOR_TEXT, bg=self.COLOR_BG, font=("Arial", 11)
         ).grid(row=0, column=0, sticky="e", pady=4, padx=6)
 
         tk.Spinbox(
-            inner, from_=1, to=10, textvariable=self.board_size_var, width=4,
+            inner, from_=2, to=10, textvariable=self.board_size_var, width=4,
             justify="center", fg=self.COLOR_TEXT
         ).grid(row=0, column=1, sticky="w", pady=4)
 
@@ -340,7 +354,7 @@ class GameSetup:
 
         self.start_button = tk.Button(
             footer, text="Start Game", command=self.finish_setup, state="disabled",
-            bg=self.COLOR_BTN, fg=self.COLOR_TEXT,
+            bg=self.COLOR_BTN, fg="#E36BAE",
             activebackground=self.COLOR_BTN, activeforeground=self.COLOR_TEXT,
             relief="flat", bd=1, highlightthickness=0,
             width=20, height=2, font=("Helvetica", 11, "bold")
