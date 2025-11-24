@@ -8,7 +8,8 @@ The game tests both short-term tactics and long-term planning, and provides a pl
 ## Contributors
 - Anna Roson
 - Antonia Sophie Gilles
-- Aron Vaisman - SafeChoice Strategy
+- Aron Vaisman - SafeChoi
+- ce Strategy
 - Giulia Dorata
 - Marton Nemeth
 - Sina Maria Schlegel
