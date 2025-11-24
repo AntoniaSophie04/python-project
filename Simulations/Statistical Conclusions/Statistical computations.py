@@ -3,7 +3,14 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 
-csv = pd.read_csv("/Users/giulia/PycharmProjects/python-project/Simulations/Results/simulation_results2.csv")
+from pathlib import Path
+
+import os
+
+script_dir = os.path.dirname(os.path.abspath(__file__))    # ...\Simulations\Statistical Conclusions
+csv_path = os.path.normpath(os.path.join(script_dir, "..", "Results", "simulation_results2.csv"))
+
+csv = pd.read_csv(csv_path)
 strategies = ['Greedy', 'MCTS', 'Minimax', 'Random', 'SafeChoice']
 
 
