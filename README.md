@@ -16,7 +16,7 @@ The game tests both short-term tactics and long-term planning, and provides a pl
   - Implemented the random matrix creation. 
   - Worked on `GameHandler.py`and `fileReading.py`
 ### Aron Vaisman
-  - `safe_choice_strategy.py`
+  - Developed the `safe_choice_strategy.py`
 ### Giulia Dorata
 - Developed the `GreedyStrategy.py`
 - Performed the `Statistical computations.py` supporting strategy evaluation.
