@@ -15,6 +15,7 @@ The game tests both short-term tactics and long-term planning, and provides a pl
   - Developed the core `GameSetup.py` logic.
   - Implemented the random matrix creation. 
   - Worked on `GameHandler.py`and `fileReading.py`
+  - Co-created the presentation and presented
 ### Aron Vaisman
   - Developed the `safe_choice_strategy.py`
 ### Giulia Dorata
@@ -22,6 +23,8 @@ The game tests both short-term tactics and long-term planning, and provides a pl
 - Performed the `Statistical computations.py` supporting strategy evaluation.
 - Graph creation supporting the statistical outputs
 ### Marton Nemeth
+- Developed the Minimax strategy with alpha-beta pruning ('minimax_f.py')
+- Co-created the presentation and presented
 ### Sina Maria Schlegel
   - Designed a Monte Carlo Tree Search (MCTS) strategy implementing the standard phases: Selection (using UCB1), Expansion, Simulation (with a greedy bias), and Backpropagation. 
   - Integrated all strategies into a Simulation Engine to evaluate performance. 
