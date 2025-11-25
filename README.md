@@ -6,14 +6,20 @@ The game tests both short-term tactics and long-term planning, and provides a pl
 ---
 
 ## Contributors
-- Anna Roson
-- Antonia Sophie Gilles
-- Aron Vaisman - SafeChoi
-- ce Strategy
-- Giulia Dorata
-- Marton Nemeth
-- Sina Maria Schlegel
-
+### Anna Roson
+  - Development of the core game architecture and setup, including: `fileReading.py`, `GameHandler.py`, `Player.py`, `Board.py` , `main.py`.
+  - Design of the graphical interface
+  - Implementation of `RandomStrategy.py`
+  - Worked on the `GameSetup.py` 
+### Antonia Sophie Gilles
+### Aron Vaisman
+  - `safe_choice_strategy.py`
+### Giulia Dorata
+### Marton Nemeth
+### Sina Maria Schlegel
+  - Designed a Monte Carlo Tree Search (MCTS) strategy implementing the standard phases: Selection (using UCB1), Expansion, Simulation (with a greedy bias), and Backpropagation. 
+  - Integrated all strategies into a Simulation Engine to evaluate performance. 
+  - Ran a statistically robust tournament across multiple board sizes, playing each board twice to eliminate first-mover bias.
 ---
 
 ## Project Overview
