@@ -12,6 +12,9 @@ The game tests both short-term tactics and long-term planning, and provides a pl
   - Implementation of `RandomStrategy.py`
   - Worked on the `GameSetup.py` 
 ### Antonia Sophie Gilles
+  - Developed the core `GameSetup.py` logic.
+  - Implemented the random matrix creation. 
+  - Worked on `GameHandler.py`and `fileReading.py`.
 ### Aron Vaisman
   - `safe_choice_strategy.py`
 ### Giulia Dorata
