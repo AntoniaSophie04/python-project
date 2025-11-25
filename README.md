@@ -23,7 +23,7 @@ The game tests both short-term tactics and long-term planning, and provides a pl
 - Performed the `Statistical computations.py` supporting strategy evaluation.
 - Graph creation supporting the statistical outputs
 ### Marton Nemeth
-- Developed the Minimax strategy with alpha-beta pruning ('minimax_f.py')
+- Developed the Minimax strategy with alpha-beta pruning `minimax_f.py`
 - Co-created the presentation and presented
 ### Sina Maria Schlegel
   - Designed a Monte Carlo Tree Search (MCTS) strategy implementing the standard phases: Selection (using UCB1), Expansion, Simulation (with a greedy bias), and Backpropagation. 
