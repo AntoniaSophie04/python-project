@@ -8,7 +8,7 @@ use-cases, and implementation details.
 
 ---
 
-# 📚 Strategy Overview
+# Strategy Overview
 
 | Strategy Name           | File                      | Short Summary                                      |
 |-------------------------|---------------------------|----------------------------------------------------|
@@ -20,7 +20,7 @@ use-cases, and implementation details.
 
 ---
 
-# 🧠 Detailed Strategy Descriptions
+# Detailed Strategy Descriptions
 
 ## 1. Greedy Strategy
 **File:** `GreedyStrategy.py`
