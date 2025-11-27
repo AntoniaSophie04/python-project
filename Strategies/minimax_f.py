@@ -10,10 +10,10 @@ from .Strategy import Strategy
 
 
 class AlphaBetaNode:
-    """
-    A node representing a specific Row-Column game state.
-    Nodes are treated as immutable snapshots: board, last_move, whose turn, scores.
-    """
+
+    # A node representing a specific Row-Column game state.
+    # Nodes are treated as immutable snapshots: board, last_move, whose turn, scores.
+
     def __init__(
         self,
         board: List[List[int]],
@@ -35,12 +35,15 @@ class AlphaBetaNode:
         self._cached_moves: Optional[List[Tuple[int, int]]] = None  # avoid recompute
 
     def get_available_moves(self) -> List[Tuple[int, int]]:
-        """
-        Return all valid moves from the current state.
-        Caches the result since nodes are immutable snapshots.
-        """
+        # Return all valid moves from the current state.
+        # Caches the result since nodes are immutable snapshots.
+    
         if self._cached_moves is not None:
             return self._cached_moves
+
+        # Row-Column rule:
+            # First move: choose any non-zero cell.
+            # Afterwards: moves must lie in the same row OR same column as last_move.
 
         if self.last_move is None:
             moves = [(r, c)
@@ -66,14 +69,17 @@ class AlphaBetaNode:
         return moves
 
     def is_terminal(self) -> bool:
-        """No valid moves remain in the current row/column band."""
+        # No valid moves remain in the current row/column band.
         return len(self.get_available_moves()) == 0
 
     def generate_children(self) -> List["AlphaBetaNode"]:
-        """
-        Create child nodes for all possible moves from this state.
-        Results are cached in self.children to avoid regeneration.
-        """
+    
+    #   Create child nodes for all possible moves from this state.
+    #   Results are cached in self.children to avoid regeneration.
+        # Update the correct player's score:
+        # At this node, self.player_id identifies who is making the move.
+        # That player receives the numeric value of the chosen cell.
+
         if self.children:
             return self.children
 
@@ -107,19 +113,24 @@ class AlphaBetaNode:
 
 class AlphaBetaStrategy(Strategy):
     def __init__(self, max_nodes_budget: int = 60_000, hard_depth_cap: int = 12):
-        """
-        max_nodes_budget: target upper bound on nodes per move (rough heuristic).
-        hard_depth_cap: never search deeper than this (safety).
-        """
+        # max_nodes_budget: target upper bound on nodes per move (rough heuristic).
+        # hard_depth_cap: never search deeper than this (safety).
+    
         self.max_nodes_budget = max_nodes_budget
         self.hard_depth_cap = hard_depth_cap
         self.player_id = 1  # set in move()
 
+    # ---- Depth selection rationale ----
+    # We estimate how deep we can search in the decision tree without exploding the node count.
+    # Effective branching ~ (2*n - 1) because each turn is restricted to row+column.
+    # Solve   b^d <= max_nodes_budget   for depth d.
+    # Then clamp depth by remaining moves and a safety cap.
+    # This produces deeper search on small boards and shallower search on large boards. (Still has great performance but runs more smoothly)
+
     def _dynamic_depth(self, board, last_move) -> int:
-        """
-        Pick a depth that fits the board size and remaining moves,
-        assuming effective branching ~ min(2N-1, 10). Then solve b^d ≈ budget.
-        """
+        # Pick a depth that fits the board size and remaining moves,
+        # assuming effective branching ~ min(2N-1, 10). Then solve b^d ≈ budget.
+    
         n = len(board)
         nonzero = sum(1 for r in board for v in r if v != 0)
         # effective branching after the first move; clamp for sanity
@@ -171,15 +182,21 @@ class AlphaBetaStrategy(Strategy):
         return best_move
 
     # ---------- Heuristic (root-player centric) ----------
+    # Evaluation function:
+        # Returns a heuristic value from the perspective of the ROOT player.
+        # Components:
+            # - score_diff:  current score advantage (exact information)
+            # - mobility:    number of legal moves for root vs opponent (positional factor)
+            # - row/col potential: remaining numeric value in the last-move row and column
+            # Small weights keep the heuristic stable and avoid oscillations.
 
     def evaluate(self, node: AlphaBetaNode) -> float:
-        """
-        Fast heuristic. Positive is better for the ROOT player (self.player_id).
-        Terms:
-          - score difference (me - opp)
-          - mobility proxy (who is to move soon and how many options)
-          - row/column potential around the last move (available totals)
-        """
+        # Fast heuristic. Positive is better for the ROOT player (self.player_id).
+        # Terms:
+        #  - score difference (me - opp)
+        #  - mobility proxy (who is to move soon and how many options)
+        #  - row/column potential around the last move (available totals)
+        
         p = self.player_id  # Root player id
         me  = node.scores[p - 1]
         opp = node.scores[2 - p]
@@ -225,6 +242,13 @@ class AlphaBetaStrategy(Strategy):
         # For maximizing (root's opponent False/True alternates), order using the
         # root-player's current score seen in child to bias toward promising branches.
         root_pid = self.player_id
+        
+        # maximizing_player:
+        # True  → we choose the move that maximizes evaluation for the ROOT player
+        # False → opponent's turn; they choose a move that minimizes the ROOT score
+        #
+        # This alternation implements the minimax logic.
+
         if maximizing_player:
             # MAX node: try children that improve ROOT's score sooner
             children.sort(key=lambda ch: ch.scores[root_pid - 1], reverse=True)
@@ -245,3 +269,82 @@ class AlphaBetaStrategy(Strategy):
                 if beta <= alpha:
                     break  # Alpha cut
             return value
+
+#
+#  Summary of the AlphaBetaStrategy
+#
+#  This strategy implements a depth-limited minimax algorithm
+#  enhanced with alpha–beta pruning and dynamic depth control.
+#  It is designed specifically for the Row–Column Game, where
+#  each move restricts the next move to the same row or column
+#  of the previously chosen cell.
+#
+#  The algorithm proceeds as follows:
+#
+#  1. Node Representation:
+#     Each AlphaBetaNode is an immutable snapshot of the game
+#     state, containing:
+#         - board configuration,
+#         - last move coordinate,
+#         - player to move,
+#         - accumulated scores for both players.
+#     Children are generated only once and cached.
+#
+#  2. Move Generation:
+#     Legal moves follow the Row–Column restriction:
+#         - If no move has been played yet: any non-zero cell.
+#         - Otherwise: any non-zero cell in the last move’s
+#           row or column.
+#     This rule shapes the branching factor of the game tree.
+#
+#  3. Search Depth Selection (Dynamic):
+#     The available search depth is computed from:
+#         - estimated branching factor  b ≈ 2*n − 1
+#         - a global node budget        (max_nodes_budget)
+#         - remaining possible moves    (nonzero)
+#         - a safety hard cap           (hard_depth_cap)
+#
+#     The depth d is chosen so that:
+#           b^d  ≤  max_nodes_budget
+#     and clamped to avoid overly deep search.
+#     Small boards (3×3, 4×4) receive special-case deeper search.
+#
+#  4. Alpha–Beta Minimax Search:
+#     The strategy explores the game tree recursively:
+#         - maximizing nodes choose the move best for the
+#           ROOT player,
+#         - minimizing nodes simulate the opponent’s reply.
+#
+#     Alpha–beta pruning discards branches that cannot affect
+#     the final decision (none of the players would ever let the game to reach that state, node), dramatically improving performance.
+#     Move ordering (sorting children by score potential) makes
+#     pruning more effective.
+#
+#  5. Evaluation Function (Heuristic at Depth Cutoff):
+#     When the search reaches a terminal state or depth limit,
+#     the node is evaluated using:
+#         - exact score difference (me - opp),
+#         - mobility (legal move count advantage),
+#         - "row/col potential" (remaining sum in the current
+#           row and column).
+#
+#     These components provide a fast approximation of the
+#     position's quality for the root player when full search
+#     is computationally infeasible.
+#
+#  6. Final Move Selection:
+#     The root examines all possible first moves, evaluates
+#     each via alpha–beta minimax, and returns the move that
+#     yields the highest evaluation score.
+#     A fallback greedy rule is used only if all evaluations
+#     fail (highly unlikely).
+#
+#  Overall:
+#     This strategy combines selective deep searching (minimax),
+#     aggressive pruning (alpha–beta), and informed cutoff
+#     evaluation to create a strong but computationally feasible
+#     decision-making agent. It performs full decision tree search on very
+#     small boards and adopts heuristic-limited search on larger
+#     boards, achieving a balance between performance and speed.
+#
+# ============================================================
