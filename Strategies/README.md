@@ -71,15 +71,16 @@ Algorithm reference:
 #### **1. Selection (UCB1-Guided Search)**
 During search, the algorithm traverses the current tree using the Upper Confidence Bound (UCB1) formula:
 
-\[
+$$
 \text{UCB1}(i) = \bar{X}_i + c \sqrt{\frac{\ln(N)}{n_i}}
-\]
+$$
 
-Where:  
-- \( \bar{X}_i \) — average simulation outcome  
-- \( n_i \) — visits to this move  
-- \( N \) — total visits to the parent  
-- \( c = \sqrt{2} \) — exploration constant  
+Where:
+
+* $\bar{X}_i$ — average simulation outcome
+* $n_i$ — visits to this move
+* $N$ — total visits to the parent
+* $c = \sqrt{2}$ — exploration constant 
 
 This balances *exploitation* of strong-performing moves with *exploration* of lesser-tested moves.
 
@@ -147,9 +148,9 @@ This rule shapes the branching factor of the game tree.
 #### 3. Search Depth Selection (Dynamic):
 The available search depth is computed from:
 * estimated branching factor $b \approx 2n - 1$
-* a global node budget ($\text{max\_nodes\_budget}$)
-* remaining possible moves ($\text{nonzero}$)
-* a safety hard cap ($\text{hard\_depth\_cap}$)
+* a global node budget (`max_nodes_budget`)
+* remaining possible moves (`nonzero`)
+* a safety hard cap (`hard_depth_cap`)
 
 The depth $d$ is chosen so that:
 $$
