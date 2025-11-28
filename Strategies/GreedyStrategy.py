@@ -17,33 +17,29 @@ class GreedyStrategy(Strategy):
             If None (first turn), pick any available cell.
         """
 
-        n = len(matrix)
+        n= len(matrix)
 
-        # --- CASE 1: first move (no restrictions) ---
+        #Case 1: first move (no restrictions)
         if last_move is None:
             print("first turn")
-            available = [
-                (r, c)
+            available= [(r, c)
                 for r in range(n)
                 for c in range(n)
-                if matrix[r][c] != '-'
-            ]
+                if matrix[r][c] != '-']
         else:
             r0, c0 = last_move
-            # --- CASE 2: only pick in the same row or column ---
-            available = [
-                (r, c)
+            #Case 2: only pick in the same row or column
+            available= [(r, c)
                 for r in range(n)
                 for c in range(n)
-                if matrix[r][c] != '-' and (r == r0 or c == c0)
-            ]
+                if matrix[r][c] != '-' and (r == r0 or c == c0)]
 
         if not available:
-            return None  # no valid move left
+            return None  #no valid move left
 
-        # Pick a random valid cell
+        #Pick a random valid cell
 
-        out = max(available, key=lambda pos: float(matrix[pos[0]][pos[1]]))
+        out= max(available, key=lambda pos: float(matrix[pos[0]][pos[1]]))
         return out
 
 
