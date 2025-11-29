@@ -1,7 +1,17 @@
 # Row–Column Game 
 
-This repository contains a Python implementation of the Row–Column Game, a two-player strategic board game. Players alternately select numbers from a matrix, restricted to the opponent’s last row or column choice.  
+This repository contains a Python implementation of the Row–Column Game, a two-player strategic board game. Players take turns selecting numbers, with each move constrained to the row or column of the opponent’s previous choice. Every selected number is removed from the board and added to the player’s score, and the game ends when no valid moves remain.
 The game tests both short-term tactics and long-term planning, and provides a platform to experiment with different AI strategies such as Greedy, Minimax, and Monte Carlo Tree Search.
+
+- [Row–Column Game](#rowcolumn-game)
+  - [Contributors](#contributors)
+  - [Project Overview](#project-overview)
+    - [Game Module](#game-module)
+    - [Strategies Module](#strategies-module)
+    - [Simulations Module](#simulations-module)
+  - [Usage](#usage)
+  - [Results](#results)
+  - [Source Code Directory Tree](#source-code-directory-tree)
 
 ---
 
@@ -52,15 +62,11 @@ Includes multiple AI strategies, all following a common interface (`Strategy.py`
 
 ### Simulations Module
 Handles running multiple automated simulations and analyzing results.
-To be continued....
+- `SimulationHandler.py` – Executes repeated games and logs results  
+- `Results/` – Raw simulation outputs (CSV summaries, match data)  
+- `Statistical Conclusions/` – Win-rate plots and analysis scripts
 
 ---
-
-## Installation
-
-Not sure if needed...............
-
-
 ## Usage
 
 To start the game, run:
@@ -82,7 +88,10 @@ Simulation outcomes comparing AI strategies can be generated using:
 ```bash
 python Simulations/SimulationHandler.py
 ```
-TO be continued........................
+The results show clear performance differences: 
+- Minimax was the strongest strategy overall, achieving the highest win rates across all board sizes.  
+- MCTS and SafeChoice performed well but consistently ranked below Minimax, while Greedy showed moderate, size-dependent performance.  
+- Random was outperformed by every other strategy, winning only a negligible fraction of games.
 
 ## Source Code Directory Tree
 ```bash
@@ -98,13 +107,14 @@ TO be continued........................
 │ ├── Strategy.py                            #base strategy interface
 │ ├── RandomStrategy.py                      #random move selection
 │ ├── GreedyStrategy.py                      #greedy move selection
-│ ├── safe_choice_strategy.py                #???????????????????????????
+│ ├── safe_choice_strategy.py                #Greedy strategy enhanced with defensive heuristics.
 │ ├── minimax_f.py                           #minimax (alpha-beta pruning) implementation
 │ └── MCTS.py                                #Monte Carlo Tree Search
 │
-├── Simulations/                             #simulations for performance statistics
-│ ├── SimulationHandler.py                   #simulation loop
-│ └── Results/                               #stored simulation outputs & plots
+├── Simulations/                     #simulations for performance statistics
+│   ├── SimulationHandler.py         #simulation loop
+│   ├── Results/                     #stored simulation outputs as CSVs
+│   └── Statistical Conclusions/     #plots and statistical analysis scripts
 │
 └── main.py                                  #entry point for running the game
 ```
