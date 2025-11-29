@@ -107,14 +107,14 @@ The results show clear performance differences:
 │ ├── Strategy.py                            #base strategy interface
 │ ├── RandomStrategy.py                      #random move selection
 │ ├── GreedyStrategy.py                      #greedy move selection
-│ ├── safe_choice_strategy.py                #Greedy strategy enhanced with defensive heuristics.
+│ ├── safe_choice_strategy.py                #Greedy strategy enhanced with defensive heuristics
 │ ├── minimax_f.py                           #minimax (alpha-beta pruning) implementation
 │ └── MCTS.py                                #Monte Carlo Tree Search
 │
-├── Simulations/                     #simulations for performance statistics
-│   ├── SimulationHandler.py         #simulation loop
-│   ├── Results/                     #stored simulation outputs as CSVs
-│   └── Statistical Conclusions/     #plots and statistical analysis scripts
+├── Simulations/                             #simulations for performance statistics
+│   ├── SimulationHandler.py                 #simulation loop
+│   ├── Results/                             #stored simulation outputs as CSVs
+│   └── Statistical Conclusions/             #plots and statistical analysis scripts
 │
 └── main.py                                  #entry point for running the game
 ```
