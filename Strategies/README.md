@@ -218,9 +218,9 @@ Safer and smarter than pure greedy, but still extremely fast (no tree search).
 For each legal move (i,j), the strategy computes a composite score:
 
 $$
-\text{score}(i,j)
+score(i,j)
 = \alpha\,v(i,j)
-- \beta\,\text{opp\_best}(i,j)
+- \beta\,\text{opp_best}(i,j)
 + \gamma\,\#\{a(i,j), b(i,j)=+1\}
 + \delta\,a(i,j)
 + \epsilon\,b(i,j)
@@ -229,7 +229,7 @@ $$
 where:
 
 - $v(i,j)$ — value of the chosen cell  
-- $\text{opp\_best}(i,j)$ — opponent’s best immediate reply in row $i$ or column $j$  
+- $opp_best(i,j)$ — opponent’s best immediate reply in row $i$ or column $j$  
 - $a(i,j), b(i,j)$ — parity features from the row/column after hypothetically removing $(i,j)$  
 
 
