@@ -217,14 +217,14 @@ Safer and smarter than pure greedy, but still extremely fast (no tree search).
 #### Core Idea
 For each legal move $(i,j)$, the strategy computes a composite score:
 
-$$ score(i,j) = alpha * v(i,j) - beta * oppbest(i,j) + gamma * num_positive_parities + delta * a(i,j) + epsilon * b(i,j) $$
+$$ score(i,j) = \alpha * v(i,j) - \beta * oppbest(i,j) + \gamma * numpositiveparities + \delta * a(i,j) + \epsilon * b(i,j) $$
 
 
 where:
 
 - $v(i,j)$ — value of the chosen cell  
 - $oppbest(i,j)$ — opponent’s best immediate reply in row $i$ or column $j$  
-- num_positive_parities counts how many of $a(i,j)$ and $b(i,j)$ equal +1
+- numpositiveparities counts how many of $a(i,j)$ and $b(i,j)$ equal +1
 
 
 Default conservative weights:
