@@ -27,6 +27,7 @@ class GreedyStrategy(Strategy):
                 if matrix[r][c] != '-']
         else:
             r0, c0 = last_move
+
             #Case 2: only pick in the same row or column
             available= [(r, c)
                 for r in range(n)
@@ -36,7 +37,7 @@ class GreedyStrategy(Strategy):
         if not available:
             return None  #no valid move left
 
-        #Pick a random valid cell
+        #Pick the highest valid cell
 
         out= max(available, key=lambda pos: float(matrix[pos[0]][pos[1]]))
         return out
